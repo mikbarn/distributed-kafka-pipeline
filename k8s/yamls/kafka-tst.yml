@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ktest
+  labels:
+    app: kafka-app
+  namespace: kafka
+spec:
+  serviceName: kafka-svc
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-app
+  template:
+    metadata:
+      labels:
+        app: kafka-app
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: "OnRootMismatch"
+      # initContainers:
+      #   - name: change-ownership-container
+      #     image: busybox:stable
+      #     imagePullPolicy: IfNotPresent
+      #     command: ["/bin/sh"]
+      #     args: ["-c", "chmod -R 755 /opt/kafka/mnt && chown 1000:1000 /opt/kafka/mnt"]
+          # securityContext:
+          #   runAsUser: 0
+          #   privileged: true
+          # volumeMounts:
+          #   - name: host-volume
+          #     mountPath: /opt/kafka/mnt
+      containers:
+        - name: kafka-container
+          image: my_kraft:1
+          imagePullPolicy: IfNotPresent
+          command: ["tail", "-f", "/dev/null"]
+          ports:
+            - containerPort: 9092
+            - containerPort: 9093
+            - containerPort: 5000
+          env:
+            - name: REPLICAS
+              value: '1'
+            - name: DEFAULT_REPLICATION_FACTOR
+              value: '3'
+            - name: DEFAULT_MIN_INSYNC_REPLICAS
+              value: '2'
+            - name: KAFKA_BROKER_ID
+              value: '-1'
+            - name: IS_CONTROLLER
+              value: 'YES'
+            - name: CFG_FILE
+              value: 'config/kraft/controller.properties'
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/kafka
+            # - name: host-volume
+            #   mountPath: /opt/kafka/mnt
+      # volumes:
+      #   - name: host-volume
+      #     hostPath:
+      #       path: /tmp
+      #       type: Directory
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - "ReadWriteOnce"
+        resources:
+          requests:
+            storage: "1Gi"
+

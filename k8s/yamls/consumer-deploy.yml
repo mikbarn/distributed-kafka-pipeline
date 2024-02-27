@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-scala-consumer
+  namespace: kafka
+  labels:
+    app:  kafka-scala-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-scala-consumer
+  template:
+    metadata:
+      labels:
+        app: kafka-scala-consumer
+    spec:
+      containers:
+      - name: kafka-scala-consumer
+        image: my_scala_consumer:1
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 9092
+          - containerPort: 5000

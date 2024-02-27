@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-nginx
+  labels:
+    app: kafka-app-nginx
+  namespace: kafka
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kafka-app-nginx
+  template:
+    metadata:
+      labels:
+        app: kafka-app-nginx
+    spec:
+      containers:
+        - name: kafka-nginx
+          image: my_nprox:1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 30000
+            - containerPort: 30001
+            - containerPort: 30002
+            - containerPort: 30003
+          env:
+            - name: TESTING
+              value: '123'
