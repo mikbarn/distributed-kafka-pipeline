@@ -16,6 +16,8 @@ data:
   FMT_DIR: "Y"
   TIMEOUT: '600'
   EXTERNAL_IP: "192.168.58.2"
+  KAFKA_HOME: "/opt/kafka/mnt/kafka_2.13-3.6.1"
+  LOG_DIR: "/tmp/"
 
 ---
 apiVersion: apps/v1
@@ -40,7 +42,8 @@ spec:
         - name: kafka-kraft-container
           image: my_kraft:1
           imagePullPolicy: IfNotPresent
-          command: ["bash", "-c", "/opt/kafka/init_ctlr.sh"]
+          command: ["bash", "-c", "/opt/kafka/mnt/kafka_init.sh"]
+          #command: ["tail", "-f", "/dev/null"]
           ports:
             - containerPort: 9092
             - containerPort: 9093
@@ -63,7 +66,7 @@ spec:
             - name: data
               mountPath: /mnt/kafka
             - name: host-volume
-              mountPath: /opt/kafka
+              mountPath: /opt/kafka/mnt
       volumes:
         - name: host-volume
           hostPath:
@@ -104,7 +107,7 @@ spec:
         - name: kafka-container
           image: my_kraft:1
           imagePullPolicy: IfNotPresent
-          command: ["bash", "-c", "/opt/kafka/init_ctlr.sh"]
+          command: ["bash", "-c", "/opt/kafka/mnt/kafka_init.sh"]
           ports:
             - containerPort: 9092
             - containerPort: 9093
@@ -122,12 +125,12 @@ spec:
             - name: IS_CONTROLLER
               value: 'NO'
             - name: CFG_FILE
-              value: 'config/kraft/broker.properties'            
+              value: 'config/kraft/broker.properties'
           volumeMounts:
             - name: data
               mountPath: /mnt/kafka
             - name: host-volume
-              mountPath: /opt/kafka
+              mountPath: /opt/kafka/mnt
       volumes:
         - name: host-volume
           hostPath:

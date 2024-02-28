@@ -52,7 +52,7 @@ object KafkaExample {
             while (count < 100 && delta() < 1000 * 60 * 10)  {
                 println(s"${delta()} ms have elapsed!")
                 //val dur = Duration.ofMillis(10)
-                val dur = Duration.ofSeconds(1)
+                val dur = Duration.ofSeconds(30)
                 val consRecs = this.synchronized {
                     kafkaConsumer.poll(dur)
                 }

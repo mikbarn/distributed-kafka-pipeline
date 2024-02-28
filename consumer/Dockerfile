@@ -1,19 +1,4 @@
-FROM ubuntu:20.04
-
-# RUN apt update
-# RUN apt install -y default-jre
-# RUN apt install -y dnsutils
-# RUN apt install -y netcat
-# RUN apt install -y iputils-ping
-# RUN apt install -y net-tools
-# RUN apt install iproute2 -y
-
-RUN apt update && \ 
-    apt install -y  \
-    default-jre \
-    dnsutils \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt clean
+FROM ibmjava:8-jre
 
 RUN groupadd kafkagrp
 RUN useradd -g kafkagrp -m -d /home/kafkauser -s /bin/bash kafkauser
