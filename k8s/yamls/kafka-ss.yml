@@ -40,6 +40,7 @@ spec:
         - name: kafka-kraft-container
           image: my_kraft:1
           imagePullPolicy: IfNotPresent
+          command: ["bash", "-c", "/opt/kafka/init_ctlr.sh"]
           ports:
             - containerPort: 9092
             - containerPort: 9093
@@ -61,6 +62,13 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /mnt/kafka
+            - name: host-volume
+              mountPath: /opt/kafka
+      volumes:
+        - name: host-volume
+          hostPath:
+            path: /kafkamnt
+            type: Directory
 
   volumeClaimTemplates:
     - metadata:
@@ -96,6 +104,7 @@ spec:
         - name: kafka-container
           image: my_kraft:1
           imagePullPolicy: IfNotPresent
+          command: ["bash", "-c", "/opt/kafka/init_ctlr.sh"]
           ports:
             - containerPort: 9092
             - containerPort: 9093
@@ -113,10 +122,17 @@ spec:
             - name: IS_CONTROLLER
               value: 'NO'
             - name: CFG_FILE
-              value: 'config/kraft/broker.properties'
+              value: 'config/kraft/broker.properties'            
           volumeMounts:
             - name: data
               mountPath: /mnt/kafka
+            - name: host-volume
+              mountPath: /opt/kafka
+      volumes:
+        - name: host-volume
+          hostPath:
+            path: /kafkamnt
+            type: Directory
   volumeClaimTemplates:
     - metadata:
         name: data

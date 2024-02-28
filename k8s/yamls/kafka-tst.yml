@@ -57,13 +57,13 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /mnt/kafka
-            # - name: host-volume
-            #   mountPath: /opt/kafka/mnt
-      # volumes:
-      #   - name: host-volume
-      #     hostPath:
-      #       path: /tmp
-      #       type: Directory
+            - name: host-volume
+              mountPath: /opt/kafka
+      volumes:
+        - name: host-volume
+          hostPath:
+            path: /kmnt
+            type: Directory
   volumeClaimTemplates:
     - metadata:
         name: data

@@ -6,6 +6,7 @@ IS_CONTROLLER="${IS_CONTROLLER:=NO}"
 FMT_DIR="${FMT_DIR:=}"
 TIMEOUT="${TIMEOUT:=30}"
 EXTERNAL_IP="${EXTERNAL_IP:=}"
+KAFKA_HOME="${KAFKA_HOME:=kafka_2.13-3.6.1}"
 
 get_server() {
     y=( $(echo $1 | awk '{n=split($0,a,"-"); for (i=1; i<=n; i++) print a[i]}') );
@@ -92,13 +93,21 @@ done
 
 server_list=${server_list:1};
 
+echo "KAFKA_HOME: $KAFKA_HOME"
 echo "File to edit: $CFG_FILE";
 echo "Updating quorum voters to: ";
 echo $server_list;
 
+node_offset=$(get_server $(hostname) y);
+myhostname=$(hostname)
+my_file="my_config_$myhostname.properties";
+cmd="cp $KAFKA_HOME/$CFG_FILE $my_file";
+echo "Running cmd: $cmd";
+$cmd;
+CFG_FILE=$my_file;
+
 sed -i "s/controller.quorum.voters=.*/controller.quorum.voters=$server_list/" $CFG_FILE;
 
-node_offset=$(get_server $(hostname) y);
 
 if [[ $IS_CONTROLLER == "YES" ]]; then
     node_id=$(($node_offset + 1))
@@ -139,10 +148,10 @@ else
 fi
 
 if [[ -n $FMT_DIR ]]; then
-    bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c $CFG_FILE
+    $KAFKA_HOME/bin/kafka-storage.sh format -t $KAFKA_CLUSTER_ID -c $CFG_FILE
 fi
 
-cmd="bin/kafka-server-start.sh $CFG_FILE";
+cmd="$KAFKA_HOME/bin/kafka-server-start.sh $CFG_FILE";
 echo "Running command: $cmd";
 $cmd
 

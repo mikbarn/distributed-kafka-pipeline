@@ -6,7 +6,7 @@ metadata:
   labels:
     app:  kafka-scala-consumer
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: kafka-scala-consumer
@@ -17,8 +17,11 @@ spec:
     spec:
       containers:
       - name: kafka-scala-consumer
-        image: my_scala_consumer:1
+        image: my_cons:1
         imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 9092
           - containerPort: 5000
+        env:
+          - name: BOOTSTRAP_SERVER
+            value: '192.168.49.2:30000'
